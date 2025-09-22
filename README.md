@@ -4,3 +4,27 @@ This paper presents a novel framework for computing optimal control by exploitin
 
 
 
+## Example 1: Stabilization
+<p align="center">
+<img src="Figures/ACC/example1_SKOOPI.png" width="500">
+</p>
+
+<p align="center">
+<img src="Figures/ACC/example1LQR.png" width="500">
+</p>
+
+<p align="center">
+<img src="Figures/ACC/example1_SKOOPI.png" width="500">
+</p>
+
+## Example 2: Trajectory Tracking
+
+Case 1:
+<p align="center">
+<img src="Figures/ACC/example2_comparison.png" width="500">
+</p>
+
+Case 2:
+<p align="center">
+<img src="Figures/ACC/example2_comparison2.png" width="500">
+</p>
