@@ -1,0 +1,51 @@
+function grad_phi_dim = compute_gradients(x_op, phi)
+% Compute the gradient of phi at the operating point x_op.
+%
+% Inputs:
+% x_op     : current operating point (1 x n_dim array)
+% phi      : struct containing phi values, phi_linear, phi_nonlinear, and phi_integrand
+%
+% Outputs:
+% grad_phi_x_op : Matrix containing the gradient of phi at x_op for each dimension
+
+    n_dim = length(x_op);   % Dimension of the space
+    local_grid = phi.grid;  % Local grid values
+    local_axes = phi.axis;  % Axis values for each dimension
+
+    % Flatten each grid into a column and concatenate into a matrix of points
+    grid_points = cellfun(@(grid) grid(:), local_grid, 'UniformOutput', false);
+    grid_points = [grid_points{:}];  % Concatenate into a single matrix
+    
+    % Initialize variables to store each dimension's phi values
+    phi_dim = cell(n_dim, 1);
+    grad_phi_dim = cell(n_dim, n_dim);
+    
+    % loop for each eig fun
+    for dim = 1:n_dim
+        % Get the grid for the current dimension (axis values for this dimension)
+        axis = local_axes{dim};
+        
+        % Extract the phi values for this dimension (phi_dim)
+        phi_dim = phi.phi{dim};  % phi values for the current dimension
+        
+        % Find the index corresponding to the center (midpoint) of the grid
+        idx_center = ceil(length(axis) / 2);
+        
+        % loop for each direction
+        for dir = 1:n_dim
+            % Initialize the gradient at the center (start with NaN for safety)
+            grad_phi = nan(n_dim,1);
+            
+            % Calculate the gradient at the center point using central difference
+            if idx_center > 1 && idx_center < length(axis)
+                % Central difference step size
+                delta_x = axis(idx_center + 1) - axis(idx_center - 1); 
+                grad_phi(dir,1) = (phi_dim(idx_center,idx_center + 1) - phi_dim(idx_center - 1)) / delta_x;
+            end
+        end
+        
+        % Store the gradient in the cell array for this dimension
+        grad_phi_center{dim} = grad_phi;
+    end
+    
+end
