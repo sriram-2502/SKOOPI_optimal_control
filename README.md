@@ -24,7 +24,7 @@ Case 1: We initialize the system close to the stable equilibrium point with the 
 <img src="Figures/ACC/example2_comparison.png" width="500">
 </p>
 
-Case 2: We initialize the system with the position of the end effector at $x_0 = (1.5,\;0)$. The Figure below shows the snapshots of the system tracking the reference trajectory (green) with the proposed eigenfunction-based controller (SKOOPI) and the finite-time LQR controller (FT-LQR). Note that the proposed SKOOPI controller tracks the reference more closely compared to the FT-LQR. The total state cost $\sum\left(\left(x-x^\star)^\top \Q (x-x^\star) \right)\right)$ for SKOOPI is $757.8$ which is much lower than $72463.3$ for FT-LQR (an improvement of $98.95\%$ for this case).
+Case 2: We initialize the system with the position of the end effector at $x_0 = (1.5,\;0)$. The Figure below shows the snapshots of the system tracking the reference trajectory (green) with the proposed eigenfunction-based controller (SKOOPI) and the finite-time LQR controller (FT-LQR). Note that the proposed SKOOPI controller tracks the reference more closely compared to the FT-LQR. The total state cost $\sum\left(\left(x-x^\star)^\top Q (x-x^\star) \right)\right)$ for SKOOPI is $757.8$ which is much lower than $72463.3$ for FT-LQR (an improvement of $98.95\%$ for this case).
 
 <p align="center">
 <img src="Figures/ACC/example2_comparison2.png" width="500">
