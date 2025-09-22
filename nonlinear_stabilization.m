@@ -192,7 +192,7 @@ xlim([-20,20]); ylim([-20,20]);
 t = t_grid(:);               % Nsteps x 1
 tc = t(2:end);               % control timeline (Nsteps-1 x 1)
 
-plot_method_time_and_controls(X1_all, U1_all, C(1,:), 'LQR',    alpha_line, t, tc, n_ctrl);
+plot_method_time_and_controls(X1_all, U1_all, C(3,:), 'LQR',    alpha_line, t, tc, n_ctrl);
 plot_method_time_and_controls(X3_all, U3_all, C(2,:), 'LQR-FT', alpha_line, t, tc, n_ctrl);
 plot_method_time_and_controls(X2_all, U2_all, C(1,:), 'SKOOPI', alpha_line, t, tc, n_ctrl);
 

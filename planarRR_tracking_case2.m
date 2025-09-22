@@ -284,14 +284,14 @@ Ju_skoopi = 0;  Jx_skoopi = 0;
 for k = 1:T
     x = X_skoopi(:,k);
     xref = x_ref(:,k);
-    Jx_skoopi = Jx_skoopi + (x-xref)'*Q*(x-xref);          % + *dt if you want dt-weighted
+    Jx_skoopi = Jx_skoopi + (x-xref)'*Q*(x-xref);      
     if k <= size(U_skoopi,2)
         u = U_skoopi(:,k);
-        Ju_skoopi = Ju_skoopi + (u.'*R*u);      % + *dt if you want dt-weighted
+        Ju_skoopi = Ju_skoopi + (u.'*R*u);     
     end
 end
 
-fprintf('SKOOPI: Jx = %.6g, Ju = %.6g, Total = %.6g\n', ...
+fprintf('SKOOPI: Jx = %.3g, Ju = %.3g, Total = %.3g\n', ...
         Jx_skoopi, Ju_skoopi, Jx_skoopi + Ju_skoopi);
 
 % ===== LQR-FT =====
@@ -302,17 +302,16 @@ if exist('X_base','var') && ~isempty(X_base)
     for k = 1:T2
         x = X_base(:,k);
         xref = x_ref(:,k);
-        Jx_base = Jx_base + (x-xref)'*Q*(x-xref);          % + *dt if dt-weighted
+        Jx_base = Jx_base + (x-xref)'*Q*(x-xref);       
         if k <= size(U_base,2)
             u = U_base(:,k);
-            Ju_base = Ju_base + (u.'*R*u);      % + *dt if dt-weighted
+            Ju_base = Ju_base + (u.'*R*u);     
         end
     end
 
-    fprintf('LQR-FT: Jx = %.6g, Ju = %.6g, Total = %.6g\n', ...
+    fprintf('LQR-FT: Jx = %.3g, Ju = %.3g, Total = %.3g\n', ...
             Jx_base, Ju_base, Jx_base + Ju_base);
 end
-
 
 %% animate skpoopi
 q_skoopi = [X_skoopi(1,:)', X_skoopi(2,:)'];
