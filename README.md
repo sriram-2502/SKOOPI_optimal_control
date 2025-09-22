@@ -16,12 +16,12 @@ For comparison, we consider a finite-time LQR controller (FT-LQR) based on linea
 </p>
 
 ## Example 2: Trajectory Tracking
-We initialize the system close to the stable equilibrium point with the end effector position at $\bx_0 = (0,\;0)$. We sample 10 random configurations close to $\bx_0$. The figure below shows the snapshots of the system tracking the reference trajectory. The eigenfunction-based controller (SKOOPI) is able to track the reference with an RMSE error of $0.0848 \pm 0.0177$ while the finite-time LQR controller (FT-LQR) leads to an RMSE of $0.0801 \pm 0.0204$. Note that both methods are able to track the reference trajectory when initialized close to the stable equilibrium point. In the next case, we explore the performance of each controller when the system is initialized farther away from the stable equilibrium point.
+We initialize the system close to the stable equilibrium point with the end effector position at $\bx_0 = (0,\;0)$. We sample 10 random configurations close to $x_0$. The figure below shows the snapshots of the system tracking the reference trajectory. The eigenfunction-based controller (SKOOPI) is able to track the reference with an RMSE error of $0.0848 \pm 0.0177$ while the finite-time LQR controller (FT-LQR) leads to an RMSE of $0.0801 \pm 0.0204$. Note that both methods are able to track the reference trajectory when initialized close to the stable equilibrium point. In the next case, we explore the performance of each controller when the system is initialized farther away from the stable equilibrium point.
 Case 1:
 <p align="center">
 <img src="Figures/ACC/example2_comparison.png" width="500">
 </p>
-We initialize the system with the position of the end effector at $\bx_0 = (1.5,\;0)$. The Figure below shows the snapshots of the system tracking the reference trajectory (green) with the proposed eigenfunction-based controller (SKOOPI) and the finite-time LQR controller (FT-LQR). Note that the proposed SKOOPI controller tracks the reference more closely compared to the FT-LQR. The total state cost $\sum\left(\left(\bx-\bx^\star)^\top \bQ (\bx-\bx^\star) \right)\right)$ for SKOOPI is $757.8$ which is much lower than $72463.3$ for FT-LQR (an improvement of $98.95\%$ for this case).
+We initialize the system with the position of the end effector at $x_0 = (1.5,\;0)$. The Figure below shows the snapshots of the system tracking the reference trajectory (green) with the proposed eigenfunction-based controller (SKOOPI) and the finite-time LQR controller (FT-LQR). Note that the proposed SKOOPI controller tracks the reference more closely compared to the FT-LQR. The total state cost $\sum\left(\left(\bx-\bx^\star)^\top \bQ (\bx-\bx^\star) \right)\right)$ for SKOOPI is $757.8$ which is much lower than $72463.3$ for FT-LQR (an improvement of $98.95\%$ for this case).
 Case 2:
 <p align="center">
 <img src="Figures/ACC/example2_comparison2.png" width="500">
