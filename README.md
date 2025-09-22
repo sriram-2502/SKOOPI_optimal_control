@@ -4,7 +4,7 @@ This paper presents a novel framework for computing optimal control by exploitin
 
 ## Example 1: Stabilization
 
-The figure below illustrates the stabilization performance of the proposed eigenfunction-based controller (SKOOPI). The stabilization performance is evaluated over 100 initial conditions, uniformly sampled within a unit disk centered at $\bx_0 = (-2,\, 3)$, and simulated for $5\,\mathrm{s}$ at $20\,\mathrm{Hz}$. Note that all trajectories converged to the equilibrium point at the origin.
+The figure below illustrates the stabilization performance of the proposed eigenfunction-based controller (SKOOPI). The stabilization performance is evaluated over 100 initial conditions, uniformly sampled within a unit disk centered at $x_0 = (-2,\, 3)$, and simulated for $5\,\mathrm{s}$ at $20\,\mathrm{Hz}$. Note that all trajectories converged to the equilibrium point at the origin.
 
 <p align="center">
 <img src="Figures/ACC/example1_SKOOPI.png" width="500">
