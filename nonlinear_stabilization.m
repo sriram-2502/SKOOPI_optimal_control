@@ -196,16 +196,6 @@ plot_method_time_and_controls(X1_all, U1_all, C(3,:), 'LQR',    alpha_line, t, t
 plot_method_time_and_controls(X3_all, U3_all, C(2,:), 'LQR-FT', alpha_line, t, tc, n_ctrl);
 plot_method_time_and_controls(X2_all, U2_all, C(1,:), 'SKOOPI', alpha_line, t, tc, n_ctrl);
 
-%% ---- RMSE and NRMSE (overall) ----
-[rmse1, nrmse1] = overall_rmse_nrmse_states(X1_all);
-[rmse2, nrmse2] = overall_rmse_nrmse_states(X2_all);
-[rmse3, nrmse3] = overall_rmse_nrmse_states(X3_all);
-
-fprintf('\n===== Overall tracking error (states vs zero) =====\n');
-fprintf('LQR    : RMSE = %.4f, NRMSE = %.2f%%%%\n', rmse1, nrmse1);
-fprintf('SKOOPI : RMSE = %.4f, NRMSE = %.2f%%%%\n', rmse2, nrmse2);
-fprintf('LQR-FT : RMSE = %.4f, NRMSE = %.2f%%%%\n\n', rmse3, nrmse3);
-
 %% ==================== local helpers ====================
 function plot_method_time_and_controls(Xcell, Ucell, color_rgb, name_str, a, t, tc, n_ctrl)
     % Creates one figure per controller with states (top) and controls (bottom).
@@ -246,32 +236,4 @@ function plot_method_time_and_controls(Xcell, Ucell, color_rgb, name_str, a, t, 
     ylabel('$u_1(t)$','Interpreter','latex');
     legend('Interpreter','latex','Location','best');
     xlim([tc(1) tc(end)]);
-end
-
-function [rmse_overall, nrmse_pct] = overall_rmse_nrmse_states(Xcell)
-% Compute overall RMSE and NRMSE (percent) across all states and all ICs
-% RMSE: sqrt(mean(x^2)) w.r.t. zero reference, pooling all time/IC samples
-% NRMSE: average over states of RMSE_state / range_state * 100
-    % Concatenate all trajectories vertically
-    Xcat = [];
-    for i = 1:numel(Xcell)
-        Xcat = [Xcat; Xcell{i}]; %#ok<AGROW>
-    end
-    % Overall RMSE (all states pooled)
-    rmse_overall = sqrt(mean(Xcat(:).^2));
-
-    % Per-state NRMSE, then average
-    n_states_local = size(Xcat,2);
-    nrmse_states = zeros(n_states_local,1);
-    for d = 1:n_states_local
-        xd = Xcat(:,d);
-        rmse_d = sqrt(mean(xd.^2));
-        range_d = max(xd) - min(xd);
-        if range_d <= eps
-            nrmse_states(d) = 0; % degenerate (already at/near zero)
-        else
-            nrmse_states(d) = 100 * rmse_d / range_d;
-        end
-    end
-    nrmse_pct = mean(nrmse_states);
 end
