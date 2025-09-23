@@ -236,7 +236,7 @@ legend(axp, [hLQRp hSKOOPp hREFp], {'LQR-FT','SKOOPI','reference'}, ...
 
 % IC disk (will reuse for sweep as well)
 center = [2; 3];
-radius = 0.60;
+radius = 0.50;
 tt = linspace(0,2*pi,200);
 plot(axp, center(1)+radius*cos(tt), center(2)+radius*sin(tt), ':k', 'HandleVisibility','off');
 plot(axp, center(1), center(2), 'ok', 'MarkerFaceColor','k', 'HandleVisibility','off');
