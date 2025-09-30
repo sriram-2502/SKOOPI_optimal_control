@@ -14,7 +14,6 @@ rng(0)
 % ---------- system setup ----------
 sys_params.use_stable         = false;   % locally stable
 sys_params.use_unstable       = true;    % locally unstable
-sys_params.use_linear_riccati = false;
 
 % Load dynamics & system info
 sys_info   = nonlinear_sys_info(sys_params);
@@ -25,7 +24,7 @@ n_ctrl     = sys_info.ctrl_dim;
 A = sys_info.A;
 B = sys_info.B;
 
-% Analytical eigenvector matrix at origin (your helper)
+% Analytical eigenvector matrix at origin
 W = sys_info.grad_eigen_fun_analytical([0;0]);
 sys_info.eig_vectors = W;
 
@@ -34,7 +33,7 @@ Q_baseline = 1e2*eye(n_states);
 R_baseline = 1e1*eye(n_ctrl);
 lqr_params_baseline = get_lqr(A, B, Q_baseline, R_baseline);
 
-% ---------- SKOOPI / psi coordinates (your current approach uses A,B) ----------
+% ---------- SKOOPI / psi coordinates ----------
 Q  = Q_baseline;
 R  = R_baseline;
 QN = 1e3*Q_baseline;
@@ -84,9 +83,9 @@ U3_all = cell(N_ic,1);   % LQR-FT controls
 
 % ---------- figure & colors for phase portrait ----------
 if ~ishandle(1)
-    figure(1);  % create if it doesn't exist
+    figure(1); 
 end
-figure(1);  % make fig.1 current
+figure(1);
 
 axp = subplot(4,4,[1 2 5 6]);  % phase panel
 hold(axp,'on'); box(axp,'on'); grid(axp,'on');
@@ -122,24 +121,24 @@ for k = 1:N_ic
         % --- Controller 1: infinite-horizon LQR ---
         u1 = -lqr_params_baseline.K_lqr * x1';        % (n_ctrl x 1)
 
+        % --- Controller 2: SKOOPI (time-varying quadratic form in lifted coords) ---
+        % psi_x_anal = x2' + inv(W') * sys_info.transform_fun_analytical(x2');
+        % idp   = min(iter, size(P_riccati,1));
+        % Pk    = reshape(P_riccati(idp,:), n_states, n_states);
+        % u2    = -inv(R)*B'*(Pk*psi_x_anal);
+
+        % --- Controller 2: finite-horizon SKOOPI --- 
+        psi_x = x2' + inv(W') * sys_info.transform_fun_analytical(x2'); 
+        idx = min(iter, numel(K_fb_list)); 
+        K_fb = K_fb_list{idx}; 
+        K_ff = K_ff_list{idx}; 
+        u2 = -K_fb * (psi_x) - K_ff;
+
         % --- Controller 3: finite-horizon LQR (feedback + feedforward) ---
         idx = min(iter, numel(K_fb_list));
         K_fb = K_fb_list{idx};
         K_ff = K_ff_list{idx};
         u3   = -K_fb * x3' - K_ff;
-
-        % --- Controller 2: SKOOPI (time-varying quadratic form in lifted coords) ---
-        psi_x_anal = x2' + inv(W') * sys_info.transform_fun_analytical(x2');
-        idp   = min(iter, size(P_riccati,1));
-        Pk    = reshape(P_riccati(idp,:), n_states, n_states);
-        u2    = -inv(R)*B'*(Pk*psi_x_anal);
-
-        % --- Controller 4: finite-horizon SKOOPI --- 
-        psi_x_anal = x2' + inv(W') * sys_info.transform_fun_analytical(x2'); 
-        idx = min(iter, numel(K_fb_list)); 
-        K_fb = K_fb_list{idx}; 
-        K_ff = K_ff_list{idx}; 
-        u2 = -K_fb * (psi_x_anal) - K_ff;
 
         % switch to LQR when close / invalid
         if ~isfinite(u2) || any(abs(u2)>1e3) || norm(x2) <= 1e-3
@@ -188,7 +187,7 @@ plot(axp, NaN, NaN, '-', 'Color', C(2,:), 'LineWidth', 2.2, 'DisplayName','LQR-F
 plot(axp, NaN, NaN, '-', 'Color', C(3,:), 'LineWidth', 2.2, 'DisplayName','SKOOPI');
 xlim([-20,20]); ylim([-20,20]);
 
-%% ---- New figures: state & control trajectories vs time for each method ----
+%% ---- figures: state & control trajectories vs time for each method ----
 t = t_grid(:);               % Nsteps x 1
 tc = t(2:end);               % control timeline (Nsteps-1 x 1)
 
