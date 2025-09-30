@@ -1,7 +1,7 @@
 function animate_planarRR(t,joints,ee_plan,x_ini )
 
 %% get robot params
-[robot_params,euler_params,~,~,animate_params] = get_params_planarRR();
+[robot_params,euler_params,~,animate_params] = get_params_planarRR();
 
 %% setup gif
 f1 = figure(999);
@@ -14,7 +14,7 @@ if flag_movie
         name = ['animations/planarRR.mp4'];
         vidfile = VideoWriter(name,'MPEG-4');
     catch ME
-        name = ['/animations/planarRR'];
+        name = ['animations/planarRR'];
         vidfile = VideoWriter(name,'Motion JPEG AVI');
     end
     open(vidfile);

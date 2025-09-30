@@ -5,6 +5,12 @@
 clc; clear; close all
 rng(134);
 
+% ---------- default plot options ----------
+set(0,'DefaultLineLineWidth',2)
+set(0,'DefaultAxesLineWidth',2)
+set(0,'DefaultAxesFontSize',18)
+set(0,'defaultfigurecolor',[1 1 1])
+
 % ----- paths (adapt as needed) -----
 addpath(genpath('robotic_arm'))
 addpath('dynamics')
@@ -27,7 +33,7 @@ u = sym('u',[2 1],'real');
 syms t;
 
 % ----- get params / models -----
-[robot_params,euler_params,navigation_params,lqr_params,animate_params] = get_params_planarRR(x); %#ok<ASGLU>
+[robot_params,euler_params,navigation_params,animate_params] = get_params_planarRR(x);
 
 % parse system information (provides sym M,C,G; numeric/handles A,B,g, etc.)
 sys_info = planarRR_info(0, q, u, robot_params, sys_params);

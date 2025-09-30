@@ -12,6 +12,12 @@ addpath('utils')
 addpath('animations')
 addpath('planarRR')
 
+% ---------- default plot options ----------
+set(0,'DefaultLineLineWidth',2)
+set(0,'DefaultAxesLineWidth',2)
+set(0,'DefaultAxesFontSize',18)
+set(0,'defaultfigurecolor',[1 1 1])
+
 % ----- flags & system toggles -----
 show_diagnositcs = true;
 sys_params.use_stable = false;
@@ -24,7 +30,7 @@ u = sym('u',[2 1],'real');
 syms t;
 
 % ----- get params / models -----
-[robot_params,euler_params,navigation_params,lqr_params,animate_params] = get_params_planarRR(x);
+[robot_params,euler_params,navigation_params,animate_params] = get_params_planarRR(x);
 
 % parse system information (provides sym M,C,G; numeric/handles A,B,g, etc.)
 sys_info = planarRR_info(0, q, u, robot_params, sys_params);

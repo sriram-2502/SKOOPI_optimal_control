@@ -1,4 +1,4 @@
-function [robot_params,euler_params,navigation_params,lqr_params,animate_params] = get_params_planarRR(x)
+function [robot_params,euler_params,navigation_params,animate_params] = get_params_planarRR(x)
 
 if(nargin<1)
     x = sym('x',2);
@@ -44,6 +44,3 @@ animate_params.static_obs = 1;
 
 % params for plotting obstalce in joint space
 animate_params.plot_joint_obs = 1;
-
-%% Form system matrices and LQR Gain
-lqr_params = get_LQR_planarRR(x);
