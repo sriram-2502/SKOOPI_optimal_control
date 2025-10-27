@@ -44,7 +44,6 @@ t_start  = 0;
 t_end    = 5.0;
 
 %% ---------- Precompute reference & time-varying gains (tracking form) ----------
-% Build an open-loop reference (same style as your script)
 x_desired = [2;3];
 psi_list  = {};               % for SKOOPI (psi-coords)
 x_desired_list = {};
