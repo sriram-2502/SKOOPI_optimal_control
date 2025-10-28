@@ -148,7 +148,7 @@ xlim([-15,5])
 ylim([-3,8])
 
 %% ---------- IC SWEEP from a DISK (100 ICs) ----------
-N_ic = 1;
+N_ic = 10;
 theta = 2*pi*rand(N_ic,1);
 rad   = radius * sqrt(rand(N_ic,1));
 ICs   = center.' + [rad.*cos(theta), rad.*sin(theta)];  % N_ic x 2
@@ -163,7 +163,7 @@ E2_LQR   = nan(Tn, N_ic);  E2_SKOOP = nan(Tn, N_ic);
 
 % store time series if needed later
 Xb_all = cell(N_ic,1);
-Xb_all = cell(N_ic,1);
+Xs_all = cell(N_ic,1);
 Ub_all = cell(N_ic,1);   % controls for LQR-FT (each cell: Tn x 1)
 Us_all = cell(N_ic,1);   % controls for SKOOPI (each cell: Tn x 1)
 
@@ -209,7 +209,7 @@ for k = 1:N_ic
         U_s = [U_s; u2];  
     end
 
-    Xb_all{k} = X_b;  Xb_all{k} = X_s;
+    Xb_all{k} = X_b;  Xs_all{k} = X_s;
     Ub_all{k} = U_b;      % Tn x 1
     Us_all{k} = U_s;      % Tn x 1
 
@@ -250,7 +250,7 @@ ax_e2  = subplot(4,4,[7 8]); hold(ax_e2,'on');  box(ax_e2,'on');  grid(ax_e2,'on
 % spaghetti for states (hidden from legends)
 for k = 1:N_ic
     Xb_use = Xb_all{k}(2:end,:);   % Tn x 2
-    Xs_use = Xb_all{k}(2:end,:);
+    Xs_use = Xs_all{k}(2:end,:);
     plotTransparentLine(ax_ts1, t_vec(:), Xb_use(:,1), colLQR,   alphaLine);
     plotTransparentLine(ax_ts1, t_vec(:), Xs_use(:,1), colSKOOP, alphaLine);
     plotTransparentLine(ax_ts2, t_vec(:), Xb_use(:,2), colLQR,   alphaLine);
