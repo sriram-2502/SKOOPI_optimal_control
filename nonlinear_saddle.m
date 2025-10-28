@@ -118,7 +118,7 @@ g_list1 = {}; g_list2 = {};   % g along ref for SKOOPI vs baseline (B)
 
 for t_sim = dt_sim:dt_sim:t_end
     % open-loop input (feel free to change)
-    u_o = 1*cos(0.5*t_sim);
+    u_o = 50*cos(0.5*t_sim);
 
     % g(x) along reference
     g_t = sys_info.dynamics_g(x_desired);
