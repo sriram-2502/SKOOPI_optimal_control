@@ -10,19 +10,25 @@ if(sys_params.use_stable)
 elseif(sys_params.use_unstable)
     Lam = [1;2];
 else
-    % only works if eigvalue is stable for second eig fun
-    Lam = [-1;2];
+%     Lam = [-1;2];
+    Lam = [1;-3];
 end
 
 % phiST_ana = @(x1,x2)x1-2*x2;
+% for ACC paper
+% phiST_ana = @(x1,x2)sin(x1)-2*x2;
+% phiUS_ana = @(x1,x2)x1+sin(x2);
+
+% for saddle
 phiST_ana = @(x1,x2)sin(x1)-2*x2;
 phiUS_ana = @(x1,x2)x1+sin(x2);
 
-% nonlinear part of h_bar
+% nonlinear part of h_bar (purely nonlinear part)
 psiST_ana = @(x1,x2)sin(x1)-x1;
 psiUS_ana = @(x1,x2)sin(x2)-x2;
 Psi_ana = @(x1,x2)[psiUS_ana(x1,x2); psiST_ana(x1,x2)];
 
+% full eigfn phi
 Phi_ana = @(x1,x2)[phiUS_ana(x1,x2); phiST_ana(x1,x2)];
 phi_x = Phi_ana(x(1),x(2));
 dPhi_dx = simplify(jacobian(phi_x,x));
