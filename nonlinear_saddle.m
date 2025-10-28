@@ -90,7 +90,7 @@ lqr_params_transformed = get_lqr(A_transformed, B_transformed, Q_transformed, R)
 
 % ---------- simulation timing ----------
 dt_sim = 0.01;
-t_end  = 5.0;
+t_end  = 3.0;
 t_grid = 0:dt_sim:t_end;         % 1 x N
 Nsteps = numel(t_grid);
 
@@ -110,7 +110,7 @@ u_ref_mat = zeros(n_ctrl,   Nsteps-1);          % zero reference control
 
 
 %% for tracking
-x_desired = [2;3];
+x_desired = [5;5];
 psi_desired_list  = {}; h_desired_list = {};  % for SKOOPI (psi-coords)
 x_desired_list = {};
 u_desired_list = {};
@@ -153,7 +153,7 @@ u_ref = cell2mat(u_desired_list);
 
 % ---------- IC sampling (uniform in a disk around (1,2)) ----------
 N_ic   = 1;
-center = [2; 3];
+center = [5; 5];
 radius = 1;
 
 theta = 2*pi*rand(N_ic,1);
