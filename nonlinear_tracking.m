@@ -148,7 +148,7 @@ xlim([-15,5])
 ylim([-3,8])
 
 %% ---------- IC SWEEP from a DISK (100 ICs) ----------
-N_ic = 100;
+N_ic = 1;
 theta = 2*pi*rand(N_ic,1);
 rad   = radius * sqrt(rand(N_ic,1));
 ICs   = center.' + [rad.*cos(theta), rad.*sin(theta)];  % N_ic x 2
@@ -191,7 +191,7 @@ for k = 1:N_ic
         else
             Kfb2 = K_fb_list1{end};    Kff2 = K_ff_list1{end};   psi_d = psi_list{end};
         end
-        psi_x = sys_info.transform_fun_analytical(x2');
+        psi_x = inv(W') *sys_info.transform_fun_analytical(x2');
         u2    = -Kfb2 * (psi_x - psi_d) + Kff2;
 
         % clamp

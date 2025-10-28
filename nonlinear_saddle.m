@@ -8,7 +8,7 @@ set(0,'defaultfigurecolor',[1 1 1])
 % ---------- add paths (expects your existing folders/functions) ----------
 addpath('dynamics', 'baseline_control', 'eigfun_control', ...
         'compute_eigfuns', 'utils', 'animations');
-rng(0)
+rng(0);
 
 % ---------- system setup (saddle) ----------
 sys_params.use_stable         = false;   % locally stable
@@ -48,12 +48,12 @@ end
 
 % Find the linear part of the eigenfunction
 phi_x_linMat = double(subs(dPhi_dx,x,xEq));
-W = phi_x_linMat;
 % Separate the eigenvectors
 w = {};
 for i = 1:size(phi_x_linMat,2)
     w{i} = phi_x_linMat(i,:)';
 end
+W = [w{1},w{2}];
 
 %% Get linearization and non-linear part
 A = double(subs(jacobian(f_x),[x(1) x(2)]',xEq));
@@ -63,7 +63,7 @@ B = eval(subs((g_x),[x(1) x(2)]',xEq));
 fn = f_x - A*x;
 dfn_dx = simplify(jacobian(fn,x));
 % check if the nonlinear part is zero at origin
-double(subs(dfn_dx,[x(1) x(2)]',xEq))
+double(subs(dfn_dx,[x(1) x(2)]',xEq));
 
 % define matlab functions for W'Fn
 wFn = {};
@@ -89,7 +89,7 @@ lqr_params_transformed = get_lqr(A_transformed, B_transformed, Q_transformed, R)
 
 % ---------- simulation timing ----------
 dt_sim = 0.01;
-t_end  = 5.0;
+t_end  = 1.0;
 t_grid = 0:dt_sim:t_end;         % 1 x N
 Nsteps = numel(t_grid);
 
@@ -158,12 +158,15 @@ ICs = center';
 
 % ---------- arrays to collect time traces for each method ----------
 X1_all = cell(N_ic,1);   % SKOOPI states
+X2_all = cell(N_ic,1);   % LQR states
 U1_all = cell(N_ic,1);   % SKOOPI controls (Nsteps-1 x n_ctrl)
+U2_all = cell(N_ic,1);   % LQR controls (Nsteps-1 x n_ctrl)
 
 % logs for eigenfunctions (rows = time, cols = eigenfunction index)
 phi_est_log   = zeros(Nsteps, n_states);
 phi_anal_log  = zeros(Nsteps, n_states);
-
+psi_est_log   = zeros(Nsteps, n_states);
+psi_anal_log  = zeros(Nsteps, n_states);
 
 % ---------- figure & colors for phase portrait ----------
 if ~ishandle(1)
@@ -197,7 +200,7 @@ for k = 1:N_ic
     k
     % initial states for each controller path
     x1 = ICs(k,:);   % SKOPPI
-    x2 = ICs(k,:);   % SKOPPI
+    x2 = ICs(k,:);   % LQR
 
     % logs for this IC (states)
     X1 = x1;
@@ -212,16 +215,23 @@ for k = 1:N_ic
     % simulate forward in time
     for t_sim = dt_sim:dt_sim:t_end
         t_sim
-        % compute eigenfunctions
-        phi_x_op = compute_path_integrals(Lam,w,wFn,f,x1');
-        phi_analytical      = eval(subs((phi_x),[x(1) x(2)]',x1'));
 
+        % get idx
+        idx  = min(iter, numel(K_fb_list_stabilization));
+
+        % compute eigenfunctions
+        [phi_x_op, h_x_op] = compute_path_integrals(Lam,w,wFn,f,x1');
+        phi_analytical      = eval(subs((phi_x),[x(1) x(2)]',x1'));
+        
+        h_x_op2 = phi_x_op' - W'*x1';
+        psi_x_op = x1' + inv(W') * h_x_op2;
+        psi_x_analytical = x1' + inv(W') * sys_info.transform_fun_analytical(x1'); 
+         
         % logs
-        phi_est_log(iter,:)   = [phi_x_op(1);phi_x_op(2)]; % estimated
+        phi_est_log(iter,:)   = [phi_x_op(1); phi_x_op(2)]; % estimated
         phi_anal_log(iter,:)  = phi_analytical(:)'; % analytical
-           
-        psi_x_anal = x1' + inv(W') * sys_info.transform_fun_analytical(x1'); 
-        idx  = min(iter, numel(K_fb_list_stabilization)); 
+        psi_est_log(iter,:)   = psi_x_op; % estimated
+        psi_anal_log(iter,:)  = psi_x_analytical(:)'; % analytical
         
         % --- Stabilization Controller: finite-horizon SKOOPI --- 
 %         K_fb = K_fb_list_stabilization{idx}; 
@@ -231,9 +241,9 @@ for k = 1:N_ic
 
         % --- Tracking Controller: finite-horizon SKOOPI --- 
         Kfb1 = K_fb_list_tracking1{idx};  Kff1 = K_ff_list_tracking1{idx};
-        psi_x = sys_info.transform_fun_analytical(x1');
         psi_d = psi_list{idx};
-        u1    = -Kfb1 * (psi_x - psi_d) + Kff1;
+        u1    = -Kfb1 * (psi_x_analytical - psi_d) + Kff1;
+%         u1    = -Kfb1 * (psi_x_op - psi_d) + Kff1;
 
         % --- Tracking Controller: finite-horizon LQR ---
         Kfb2 = K_fb_list_tracking2{idx};  Kff2 = K_ff_list_tracking2{idx};
@@ -269,6 +279,8 @@ for k = 1:N_ic
     % store eigfns
     Phi_est_all{k}    = phi_est_log;
     Phi_anal_all{k}   = phi_anal_log;
+    Psi_est_all{k}    = psi_est_log;
+    Psi_anal_all{k}   = psi_anal_log;
 
     % plot phase-portrait trajectories with alpha (RGBA)
     plot(axp, X2(:,1), X2(:,2), '-', 'Color', [C(1,:) alpha_line], 'HandleVisibility','off');   % LQR
@@ -362,9 +374,40 @@ lgd.Interpreter='latex';
 % ylim([-20,10])
 
 
+% plot psifun
+subplot(4,4,[3 4]); hold on; grid on; box on;
+for k = 1:N_ic
+    plot(t, Psi_est_all{k}(:,1), '-', 'LineWidth', 1.5, ...
+         'DisplayName','Estimated ($\hat{\psi}_1$)');
+    plot(t, Psi_anal_all{k}(:,1), 'k--', 'LineWidth', 2, ...
+         'DisplayName','Analytical ($\psi_1$)'); 
+end
+ylabel('$\psi_1$', 'Interpreter','latex');
+% xlabel('time (s)','Interpreter','latex');
+xticklabels([])
+lgd = legend();
+lgd.Interpreter='latex';
+% ylim([-1,7])
+% xticks([1 2 3 4 5])
+% yticks([0 3 6])
+
+subplot(4,4,[7 8]); hold on; grid on; box on;
+for k = 1:N_ic
+    plot(t, Psi_est_all{k}(:,2), '-', 'LineWidth', 1.5, ...
+         'DisplayName','Estimated ($\hat{\psi}_2$)');
+    plot(t, Psi_anal_all{k}(:,2), 'k--', 'LineWidth', 2, ...
+         'DisplayName','Analytical ($\psi_2$)'); 
+end
+ylabel('$\psi_2$', 'Interpreter','latex');
+xlabel('time (s)','Interpreter','latex');
+lgd = legend();
+lgd.Interpreter='latex';
+% ylim([-20,10])
+
+
 %% ==================== local helpers ====================
 % compute path integerals for saddle
-function  phi_PI = compute_path_integrals(Lam,w,wFn,f,x_i)
+function  [phi_PI,nl_phi] = compute_path_integrals(Lam,w,wFn,f,x_i)
     ballR = 2000;
     options = odeset('RelTol',1e-6,'AbsTol',1e-6, ...
         'events',@(t, x)offFrame(t, x, 2000));
