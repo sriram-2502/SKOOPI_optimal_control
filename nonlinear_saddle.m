@@ -58,7 +58,7 @@ W = [w{1},w{2}];
 
 %% Get linearization and non-linear part
 A = double(subs(jacobian(f_x),[x(1) x(2)]',xEq));
-B = eval(subs((g_x),[x(1) x(2)]',xEq));
+B = double(subs((g_x),[x(1) x(2)]',xEq));
 
 % define nonlinear part x_dot = Ax + fn(x)
 fn = f_x - A*x;
@@ -74,14 +74,14 @@ end
 
 %% get LQR gains for stabilization
 % ---------- LQR (baseline, infinite-horizon) ----------
-Q_baseline = 1e2*eye(n_states);
-R_baseline = 1e2*eye(n_ctrl);
+Q_baseline = 1e1*eye(n_states);
+R_baseline = 1e3*eye(n_ctrl);
 lqr_params_baseline = get_lqr(A, B, Q_baseline, R_baseline);
 
 % ---------- SKOOPI / psi coordinates (your current approach uses A,B) ----------
 Q  = Q_baseline;
 R  = R_baseline;
-QN = 1e1*Q_baseline;
+QN = 1e6*Q_baseline;
 
 A_transformed = A;
 B_transformed = B;
@@ -90,7 +90,7 @@ lqr_params_transformed = get_lqr(A_transformed, B_transformed, Q_transformed, R)
 
 % ---------- simulation timing ----------
 dt_sim = 0.01;
-t_end  = 3.0;
+t_end  = 2.0;
 t_grid = 0:dt_sim:t_end;         % 1 x N
 Nsteps = numel(t_grid);
 
@@ -124,7 +124,7 @@ for t_sim = dt_sim:dt_sim:t_end
     g_t = sys_info.dynamics_g(x_desired);
 
     % store psi_d for SKOOPI
-    phi_desired = eval(subs((phi_x),[x(1) x(2)]',x_desired));
+    phi_desired = double(subs((phi_x),[x(1) x(2)]',x_desired));
     psi_desired_list{end+1}       = inv(W')*phi_desired; 
 %     psi_desired_list{end+1}       = x_desired + inv(W') * sys_info.transform_fun_analytical(x_desired); 
 %     h_desired_list{end+1}       = sys_info.transform_fun_analytical(x_desired); 
@@ -136,6 +136,9 @@ for t_sim = dt_sim:dt_sim:t_end
 
     % propagate ref
     x_desired = rk4(dynamics, dt_sim, x_desired, u_o, use_reverse, sys_info);
+    % r1 = 2;
+    % r2 = 3;
+    % x_desired = [r1*cos(t_sim);r2*sin(t_sim)];
 end
 
 x_ref = cell2mat(x_desired_list);
@@ -146,6 +149,9 @@ u_ref = cell2mat(u_desired_list);
     solve_DRE_tracking(x_ref, u_ref, A, g_list1, Q, R, QN, t_end, dt_sim);
 
 % Baseline (original coords) tracking gains (LQR-FT)
+Q  = 1e1*eye(n_states);
+R  = 1e3*eye(n_ctrl);
+QN = 1e6*Q_baseline;
 [~, ~, K_ff_list_tracking2, K_fb_list_tracking2, ~] = ...
     solve_DRE_tracking(x_ref, u_ref, A, g_list2, Q, R, QN, t_end, dt_sim);
 
@@ -219,10 +225,10 @@ for k = 1:N_ic
 
     % simulate forward in time
     for t_sim = dt_sim:dt_sim:t_end
-        t_sim
+        
         % compute eigenfunctions
         [phi_x_op,h_x_op] = compute_path_integrals(Lam,w,wFn,f,x1');
-        phi_analytical    = eval(subs((phi_x),[x(1) x(2)]',x1'));
+        phi_analytical    = double(subs((phi_x),[x(1) x(2)]',x1'));
 
         % psi_x           = x1' + inv(W') * sys_info.transform_fun_analytical(x1');
         psi_x             = inv(W')*phi_analytical(:);
